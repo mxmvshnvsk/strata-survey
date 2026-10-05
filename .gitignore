@@ -1,0 +1,5 @@
+node_modules/
+dist/
+strata-*.html
+*.survey.json
+.DS_Store

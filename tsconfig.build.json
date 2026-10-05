@@ -1,0 +1,11 @@
+{
+  // Compiles to dist/ for Node versions without built-in TypeScript support.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rewriteRelativeImportExtensions": true,
+    "sourceMap": false
+  },
+  "include": ["src", "bin"]
+}

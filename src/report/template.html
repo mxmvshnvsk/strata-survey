@@ -1,0 +1,274 @@
+<title>{{TITLE}}</title>
+<meta name="description" content="Strata: a geological survey of a git repository">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap">
+<style>
+/* Layout: a survey sheet — title cartouche, then a stratigraphic column beside field notes,
+   then full-width plates (charts) separated by thin map rules. Strata wear ICS period colors. */
+:root {
+  --paper: #eff1ed;
+  --sheet: #f8f9f6;
+  --ink: #1b222c;
+  --ink-2: #48515e;
+  --muted: #77808c;
+  --rule: #cfd4cc;
+  --rule-strong: #a9b0a6;
+  --accent: #2346c4;
+  --accent-soft: rgba(35, 70, 196, 0.12);
+  --hot: #d2452b;
+  --warn: #b7791f;
+  --ok: #2f7d4f;
+  --tip-bg: #1b222c;
+  --tip-fg: #f2f4f1;
+  --hatch: rgba(27, 34, 44, 0.28);
+  --font-display: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif-condensed, system-ui, sans-serif;
+  --font-body: 'Literata', Georgia, 'Times New Roman', serif;
+  --font-data: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.75rem;
+  --step-3: 2.75rem;
+  --step-4: clamp(2.6rem, 7vw, 4.75rem);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11151b; --sheet: #161b22; --ink: #e6e9ed; --ink-2: #b1b9c4; --muted: #808a98; --rule: #2a313b; --rule-strong: #3d4653;
+    --accent: #86a2ff; --accent-soft: rgba(134, 162, 255, 0.16); --hot: #ff7a5c; --warn: #e3a948; --ok: #5cc28a;
+    --tip-bg: #e6e9ed; --tip-fg: #11151b; --hatch: rgba(10, 12, 16, 0.38); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11151b; --sheet: #161b22; --ink: #e6e9ed; --ink-2: #b1b9c4; --muted: #808a98; --rule: #2a313b; --rule-strong: #3d4653;
+  --accent: #86a2ff; --accent-soft: rgba(134, 162, 255, 0.16); --hot: #ff7a5c; --warn: #e3a948; --ok: #5cc28a;
+  --tip-bg: #e6e9ed; --tip-fg: #11151b; --hatch: rgba(10, 12, 16, 0.38); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 var(--step-0)/1.6 var(--font-body); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); padding-block: 28px 64px; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--font-data); font-size: 0.86em; }
+h1, h2, h3, .label { font-family: var(--font-display); font-weight: 600; text-wrap: balance; }
+.label { text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--step--1); color: var(--muted); }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── Cartouche ─────────────────────────────────────────── */
+.cartouche { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: end; border: 1.5px solid var(--ink); padding: 18px 22px 16px; background: var(--sheet); position: relative; }
+.cartouche::after { content: ''; position: absolute; inset: 4px; border: 0.5px solid var(--rule-strong); pointer-events: none; }
+.cartouche h1 { margin: 2px 0 0; font-size: var(--step-4); line-height: 0.95; letter-spacing: 0.01em; font-weight: 700; overflow-wrap: anywhere; }
+.cartouche .meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 22px; font-family: var(--font-data); font-size: var(--step--1); color: var(--ink-2); border-top: 0.5px solid var(--rule-strong); padding-top: 10px; margin-top: 6px; }
+.cartouche .meta span b { color: var(--ink); font-weight: 600; }
+.controls { display: flex; gap: 8px; align-items: center; position: relative; z-index: 1; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule-strong); max-width: 100%; }
+.seg button { background: transparent; border: 0; padding: 4px 10px; font-family: var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; font-size: var(--step--1); cursor: pointer; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* ── Hero: column + notes ──────────────────────────────── */
+.hero { display: grid; grid-template-columns: minmax(250px, 340px) minmax(0, 1fr); gap: clamp(20px, 4vw, 48px); margin-top: 34px; }
+.column-wrap { min-width: 0; }
+.notes { min-width: 0; }
+.scrub { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.scrub button { width: 30px; height: 26px; border: 1px solid var(--ink); background: var(--sheet); cursor: pointer; font-size: 11px; line-height: 1; padding: 0; }
+.scrub input[type=range] { flex: 1; min-width: 0; accent-color: var(--ink); }
+.scrub output { font-family: var(--font-data); font-size: var(--step--1); color: var(--ink-2); min-width: 7.5em; text-align: right; font-variant-numeric: tabular-nums; }
+.notes ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 0; counter-reset: note; }
+.notes li { counter-increment: note; display: grid; grid-template-columns: 2.4em minmax(0, 1fr); gap: 4px; padding: 11px 0; border-top: 0.5px solid var(--rule); max-width: 72ch; }
+.notes li::before { content: counter(note, decimal-leading-zero); font-family: var(--font-data); font-size: var(--step--1); color: var(--muted); padding-top: 3px; }
+.notes li code { overflow-wrap: anywhere; background: var(--accent-soft); padding: 0 3px; }
+.notes b { font-weight: 600; }
+
+/* ── Plates (sections) ─────────────────────────────────── */
+.plate { margin-top: 56px; border-top: 1.5px solid var(--ink); padding-top: 14px; }
+.plate-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 20px; margin-bottom: 14px; }
+.plate-head h2 { margin: 0; font-size: var(--step-3); line-height: 1; letter-spacing: 0.005em; }
+.plate-head .plate-no { font-family: var(--font-data); font-size: var(--step--1); color: var(--muted); }
+.lede { color: var(--ink-2); max-width: 72ch; margin: 0 0 16px; }
+.figure { position: relative; min-width: 0; }
+.figure svg { display: block; width: 100%; height: auto; overflow: hidden; }
+.axis text, .svg-text { fill: var(--muted); font-family: var(--font-data); font-size: 11px; }
+.axis line, .axis path { stroke: var(--rule-strong); }
+.grid line { stroke: var(--rule); stroke-dasharray: 2 3; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 12px; font-size: var(--step--1); }
+.toolbar .label { margin-right: 2px; }
+.toolbar select { background: var(--sheet); border: 1px solid var(--rule-strong); padding: 3px 6px; font-family: var(--font-data); font-size: var(--step--1); max-width: 100%; }
+.crumbs { font-family: var(--font-data); font-size: var(--step--1); display: flex; flex-wrap: wrap; gap: 4px; }
+.crumbs button { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.crumbs span { color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--font-data); font-size: var(--step--1); color: var(--ink-2); margin-top: 10px; }
+.legend i { display: inline-block; width: 12px; height: 12px; vertical-align: -2px; margin-right: 5px; border: 0.5px solid var(--hatch); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+.two > * { min-width: 0; }
+
+/* ── Tables ────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); font-variant-numeric: tabular-nums; }
+th { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; color: var(--muted); text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--ink); white-space: nowrap; }
+td { padding: 6px 10px 6px 0; border-bottom: 0.5px solid var(--rule); vertical-align: top; }
+td.num, th.num { text-align: right; font-family: var(--font-data); }
+td.path { font-family: var(--font-data); overflow-wrap: anywhere; min-width: 14ch; }
+.bar { height: 6px; background: var(--rule); position: relative; min-width: 60px; margin-top: 6px; }
+.bar > span { position: absolute; inset: 0 auto 0 0; background: var(--ink-2); }
+.pill { display: inline-block; min-width: 1.7em; text-align: center; font-family: var(--font-data); font-weight: 600; padding: 0 6px; border: 1px solid currentColor; }
+.pill.bad { color: var(--hot); } .pill.mid { color: var(--warn); } .pill.good { color: var(--ok); }
+.muted { color: var(--muted); }
+
+/* ── Fossils & events ──────────────────────────────────── */
+.specimens { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+.specimen { border: 1px solid var(--rule-strong); background: var(--sheet); padding: 12px 14px; min-width: 0; display: grid; gap: 6px; align-content: start; }
+.specimen pre { margin: 0; font-family: var(--font-data); font-size: 12.5px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
+.specimen .tag { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-family: var(--font-data); font-size: 11.5px; color: var(--muted); }
+.specimen .swatch { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; border: 0.5px solid var(--hatch); }
+.events { list-style: none; padding: 0; margin: 0; }
+.events li { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) auto; gap: 12px; padding: 8px 0; border-bottom: 0.5px solid var(--rule); font-size: var(--step--1); align-items: baseline; }
+.events .when { font-family: var(--font-data); color: var(--muted); }
+.events .what { overflow-wrap: anywhere; }
+.events .n { font-family: var(--font-data); font-weight: 600; text-align: right; white-space: nowrap; }
+.events .n.minus { color: var(--hot); } .events .n.plus { color: var(--ok); }
+
+/* ── Tooltip ───────────────────────────────────────────── */
+.tip { position: fixed; z-index: 10; pointer-events: none; background: var(--tip-bg); color: var(--tip-fg); padding: 8px 10px; font: 12px/1.45 var(--font-data); max-width: min(360px, calc(100vw - 32px)); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18); }
+.tip b { font-weight: 600; }
+.tip .row { display: flex; justify-content: space-between; gap: 16px; }
+.tip hr { border: 0; border-top: 1px solid currentColor; opacity: 0.25; margin: 5px 0; }
+
+.map-search { display: flex; gap: 6px; align-items: center; margin-left: auto; }
+.map-search input { background: var(--sheet); border: 1px solid var(--rule-strong); padding: 3px 8px; font-family: var(--font-data); font-size: var(--step--1); width: min(320px, 70vw); }
+.borehole { margin-top: 18px; border: 1.5px solid var(--ink); background: var(--sheet); padding: 16px 18px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px 32px; }
+.borehole h3 { margin: 0; font-size: var(--step-2); line-height: 1.05; overflow-wrap: anywhere; font-family: var(--font-data); font-weight: 600; font-size: var(--step-1); }
+.borehole .close { float: right; background: none; border: 1px solid var(--rule-strong); cursor: pointer; padding: 2px 10px; font-family: var(--font-display); text-transform: uppercase; letter-spacing: .08em; font-size: var(--step--1); }
+.borehole .core { display: flex; height: 26px; border: 1px solid var(--ink); margin-top: 8px; }
+.borehole .core span { min-width: 2px; }
+.borehole .core-labels { display: flex; justify-content: space-between; font-family: var(--font-data); font-size: 11px; color: var(--muted); margin-top: 4px; }
+.borehole dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 12px 0 0; font-size: var(--step--1); }
+.borehole dt { color: var(--muted); font-family: var(--font-display); text-transform: uppercase; letter-spacing: .08em; }
+.borehole dd { margin: 0; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.borehole ul { list-style: none; margin: 8px 0 0; padding: 0; font-size: var(--step--1); }
+.borehole li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 5px 0; border-bottom: 0.5px solid var(--rule); }
+.borehole li .p { font-family: var(--font-data); overflow-wrap: anywhere; }
+.borehole li button { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-align: left; font: inherit; text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 860px) { .borehole { grid-template-columns: minmax(0, 1fr); } }
+.foot { margin-top: 64px; border-top: 0.5px solid var(--rule-strong); padding-top: 14px; color: var(--muted); font-size: var(--step--1); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+.foot p { margin: 4px 0 0; }
+.empty { color: var(--muted); font-style: italic; padding: 12px 0; }
+
+@media (max-width: 860px) {
+  .hero, .two { grid-template-columns: minmax(0, 1fr); }
+  .cartouche { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .layer-anim { transition: opacity 160ms ease; }
+}
+</style>
+<div class="wrap" id="app">
+  <header class="cartouche">
+    <div>
+      <div class="label" data-i18n="kicker">Geological survey of a code repository</div>
+      <h1 id="repo-name"></h1>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Language" id="lang-seg">
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-lang="ru" aria-pressed="false">RU</button>
+      </div>
+    </div>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <section class="hero">
+    <div class="column-wrap">
+      <div class="label" data-i18n="columnTitle">Stratigraphic column · code alive at HEAD</div>
+      <div class="figure" id="column"></div>
+    </div>
+    <div class="notes">
+      <div class="label" data-i18n="notesTitle">Field notes</div>
+      <ol id="notes"></ol>
+    </div>
+  </section>
+
+  <section class="plate" id="strata">
+    <div class="plate-head"><h2 data-i18n="strataTitle">Stratigraphy</h2><span class="plate-no">PLATE I</span></div>
+    <p class="lede" data-i18n="strataLede"></p>
+    <div class="toolbar" id="strata-tools"></div>
+    <div class="figure" id="strata-fig"></div>
+    <div class="legend" id="strata-legend"></div>
+  </section>
+
+  <section class="plate" id="map">
+    <div class="plate-head"><h2 data-i18n="mapTitle">Geological map</h2><span class="plate-no">PLATE II</span></div>
+    <p class="lede" data-i18n="mapLede"></p>
+    <div class="toolbar">
+      <span class="label" data-i18n="colorBy">Color by</span>
+      <div class="seg" role="group" id="map-mode"></div>
+      <div class="crumbs" id="map-crumbs"></div>
+    </div>
+    <div class="figure" id="map-fig"></div>
+    <div class="legend" id="map-legend"></div>
+    <div class="borehole" id="borehole" hidden></div>
+  </section>
+
+  <section class="plate" id="halflife">
+    <div class="plate-head"><h2 data-i18n="hlTitle">Half-life</h2><span class="plate-no">PLATE III</span></div>
+    <p class="lede" data-i18n="hlLede"></p>
+    <div class="figure" id="hl-fig"></div>
+    <div class="legend" id="hl-legend"></div>
+  </section>
+
+  <section class="plate" id="hotspots">
+    <div class="plate-head"><h2 data-i18n="hotTitle">Hotspots</h2><span class="plate-no">PLATE IV</span></div>
+    <p class="lede" data-i18n="hotLede"></p>
+    <div class="two">
+      <div class="figure" id="hot-fig"></div>
+      <div class="table-wrap" id="hot-table"></div>
+    </div>
+  </section>
+
+  <section class="plate" id="faults">
+    <div class="plate-head"><h2 data-i18n="faultTitle">Fault lines</h2><span class="plate-no">PLATE V</span></div>
+    <p class="lede" data-i18n="faultLede"></p>
+    <div class="two">
+      <div class="figure" id="fault-fig"></div>
+      <div class="table-wrap" id="fault-table"></div>
+    </div>
+  </section>
+
+  <section class="plate" id="knowledge">
+    <div class="plate-head"><h2 data-i18n="knowTitle">Knowledge &amp; bus factor</h2><span class="plate-no">PLATE VI</span></div>
+    <p class="lede" data-i18n="knowLede"></p>
+    <div class="two">
+      <div class="table-wrap" id="module-table"></div>
+      <div class="table-wrap" id="people-table"></div>
+    </div>
+  </section>
+
+  <section class="plate" id="fossils">
+    <div class="plate-head"><h2 data-i18n="fossilTitle">Fossil record</h2><span class="plate-no">PLATE VII</span></div>
+    <p class="lede" data-i18n="fossilLede"></p>
+    <div class="specimens" id="fossil-list"></div>
+  </section>
+
+  <section class="plate" id="events">
+    <div class="plate-head"><h2 data-i18n="eventsTitle">Extinctions &amp; big bangs</h2><span class="plate-no">PLATE VIII</span></div>
+    <p class="lede" data-i18n="eventsLede"></p>
+    <div class="two">
+      <div><div class="label" data-i18n="extinctions">Extinctions</div><ul class="events" id="ext-list"></ul></div>
+      <div><div class="label" data-i18n="bigBangs">Big bangs</div><ul class="events" id="bang-list"></ul></div>
+    </div>
+  </section>
+
+  <section class="plate" id="seismo">
+    <div class="plate-head"><h2 data-i18n="seisTitle">Seismograph</h2><span class="plate-no">PLATE IX</span></div>
+    <p class="lede" data-i18n="seisLede"></p>
+    <div class="figure" id="seis-fig"></div>
+  </section>
+
+  <footer class="foot" id="foot"></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+<script type="application/json" id="strata-data">{{DATA}}</script>
+<script>
+{{SCRIPT}}
+</script>
