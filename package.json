@@ -1,16 +1,36 @@
 {
   "name": "strata-survey",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A geological survey of a git repository: line-level history replay, code half-life, hotspots, temporal coupling and bus factor in one self-contained HTML report.",
-  "keywords": ["git", "code-analysis", "visualization", "software-archaeology", "git-blame", "technical-debt", "bus-factor", "hotspots", "cli", "typescript"],
+  "keywords": [
+    "git",
+    "code-analysis",
+    "visualization",
+    "software-archaeology",
+    "git-blame",
+    "technical-debt",
+    "bus-factor",
+    "hotspots",
+    "cli",
+    "typescript"
+  ],
   "homepage": "https://github.com/mxmvshnvsk/strata-survey#readme",
-  "repository": { "type": "git", "url": "git+https://github.com/mxmvshnvsk/strata-survey.git" },
-  "bugs": { "url": "https://github.com/mxmvshnvsk/strata-survey/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mxmvshnvsk/strata-survey.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mxmvshnvsk/strata-survey/issues"
+  },
   "author": "Maxim Vishnevsky",
   "license": "MIT",
   "type": "module",
-  "bin": { "strata": "dist/bin/strata.js" },
-  "engines": { "node": ">=18" },
+  "bin": {
+    "strata": "dist/bin/strata.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "survey": "node bin/strata.ts",
     "test": "node --test test/unit.test.ts test/replay.test.ts test/edge.test.ts",
@@ -18,7 +38,11 @@
     "build": "tsc -p tsconfig.build.json && node -e \"require('node:fs').cpSync('src/report/template.html', 'dist/src/report/template.html')\"",
     "prepare": "npm run build"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "@types/node": "^22.20.5",
     "typescript": "^7.0.2"
