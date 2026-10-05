@@ -2,6 +2,8 @@
 
 # Strata
 
+[![npm](https://img.shields.io/npm/v/strata-survey)](https://www.npmjs.com/package/strata-survey) [![license](https://img.shields.io/npm/l/strata-survey)](LICENSE)
+
 **A geological survey of a git repository.** Strata replays a project's entire history line by line and turns it into one self-contained HTML report. The report shows:
 
 - which layers of code survive and when they were written;
@@ -11,7 +13,7 @@
 - who holds the knowledge.
 
 ```
-$ node bin/strata.ts ~/code/express --open
+$ npx strata-survey ~/code/express --open
 
   STRATIGRAPHY · express
   2026     Quaternary           ██ 583 (2.2%)
@@ -34,38 +36,107 @@ $ node bin/strata.ts ~/code/express --open
   …
 ```
 
-- **Zero runtime dependencies.** You need git and Node. On Node 22.18 or newer the TypeScript sources run directly: no `npm install`, no build step.
+- **Zero runtime dependencies.** All you need is git and Node 18 or newer.
 - **Exact.** The line replay reproduces `git blame --first-parent` line for line (see [Accuracy](#accuracy)).
 - **Readable.** Written in strict TypeScript with plain Node and a vanilla SVG client. There is no framework anywhere, and the code is meant to be read: see [Reading the code](#reading-the-code).
 - **One file out.** The report is a single HTML file with inline SVG charts. It works offline, adapts to phones and dark mode, and switches between English and Russian.
 
-## Quick start
+## Install
+
+Strata is published on npm as [`strata-survey`](https://www.npmjs.com/package/strata-survey). It needs git and Node 18 or newer.
+
+Run it once without installing anything:
+
+```bash
+npx strata-survey /path/to/repo --open
+```
+
+Or install the `strata` command globally:
+
+```bash
+npm install -g strata-survey
+strata --version
+```
+
+The rest of this README uses `strata`. With `npx`, write `npx strata-survey` instead.
+
+## Usage
+
+Point Strata at any local git repository, or run it inside one:
+
+```bash
+cd ~/code/my-project
+strata --open                 # survey the current repository, write strata-my-project.html and open it
+```
+
+It reads history with ordinary git commands and never changes the repository. A survey takes seconds for most projects and about two minutes for git/git.
+
+### Common recipes
+
+```bash
+strata ~/code/app --lang ru                        # report and terminal summary in Russian
+strata ~/code/app -o ~/reports/app.html            # choose where the report goes
+strata ~/code/app --exclude 'fixtures/**' --exclude '**/*.snap'   # leave out noise
+strata ~/code/app --include 'packages/core/**'     # survey one part of a monorepo
+strata ~/code/app --no-report                      # terminal summary only
+strata ~/code/app --fast                           # huge merge-heavy repo: skip the merge content pass
+```
+
+Save the raw survey and render reports from it later, without git or the repository:
+
+```bash
+strata ~/code/app --json app.survey.json
+strata --from-json app.survey.json --lang ru -o app-ru.html
+```
+
+Check how closely the line replay matches `git blame` on your repository:
+
+```bash
+strata verify ~/code/app              # 60 random files
+strata verify ~/code/app --files 200  # a bigger sample
+```
+
+### Options
+
+| Option | What it does |
+|---|---|
+| `-o, --out <file>` | report path (default `strata-<repo>.html` in the current folder) |
+| `--lang en\|ru` | language of the report and of the terminal summary (the report also has an EN/RU switch) |
+| `--json <file>` | also save the raw survey as JSON |
+| `--from-json <file>` | render a report from a saved survey; no git needed |
+| `--exclude <glob>`, `--include <glob>` | narrow the survey (repeatable), e.g. `--exclude 'fixtures/**'` |
+| `--no-default-excludes` | keep lockfiles, vendored, generated and minified files, and `.po` catalogs |
+| `--name <name>` | display name for the repository |
+| `--fast` | skip the content pass that credits merged lines to side-branch authors |
+| `--open` | open the report in the default browser when done |
+| `--no-report` | print the terminal summary only |
+| `-q, --quiet` | no progress output |
+
+Run `strata --help` for the full list.
+
+### Tips
+
+- **Use a full clone.** In a shallow clone (`git clone --depth …`, common in CI) everything older than the first available commit is squashed into the bottom layer. Strata warns about it; run `git fetch --unshallow` first.
+- **The report is just a file.** Send it to a colleague, attach it to a ticket or put it on any static host. It loads nothing from the network.
+- **Lockfiles and vendored code are excluded by default**, because a 30,000-line lockfile is not code. Use `--no-default-excludes` to keep them.
+- **Author names** are merged by name and email and respect the repository's `.mailmap`. If one person still shows up twice, add a `.mailmap` entry.
+
+## Run from source
 
 ```bash
 git clone https://github.com/mxmvshnvsk/strata-survey.git
 cd strata-survey
-node bin/strata.ts /path/to/any/git/repo --open   # writes strata-<repo>.html and opens it
-node bin/strata.ts verify /path/to/repo           # check the engine against git blame
+node bin/strata.ts /path/to/repo --open   # Node 22.18+ runs the TypeScript sources directly
 ```
 
-This needs Node 22.18+ (or 23.6+), which run TypeScript by stripping the types. On older Node versions (18+), build the JavaScript once:
+On older Node versions (18+), build the JavaScript once:
 
 ```bash
-npm install                                       # installs TypeScript and builds dist/
+npm install                               # installs TypeScript and builds dist/
 node dist/bin/strata.js /path/to/repo --open
 ```
 
-To use it as a global command, run `npm install && npm link` in the project folder. After that you can call `strata <repo>` from anywhere.
-
-| Option | What it does |
-|---|---|
-| `-o, --out <file>` | report path (default `strata-<repo>.html`) |
-| `--lang en\|ru` | language of the report and of the terminal summary |
-| `--json <file>` | also save the raw survey; `--from-json <file>` re-renders a report without git |
-| `--exclude <glob>`, `--include <glob>` | narrow the survey (repeatable), e.g. `--exclude 'fixtures/**'` |
-| `--no-default-excludes` | keep lockfiles, vendored, generated and minified files, and `.po` catalogs |
-| `--fast` | skip the content pass that credits merged lines to side-branch authors |
-| `--open`, `--no-report`, `-q` | open in the browser / terminal summary only / no progress output |
+To get a global `strata` command from your checkout, run `npm install && npm link`.
 
 ## Examples
 

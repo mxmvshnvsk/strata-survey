@@ -24,15 +24,15 @@ The key technical trick is that **line contents are not needed**. The hunk heade
 | Everyone | How stable is our code? | Half-life of source vs tests vs docs |
 | Retrospectives | What happened here in 2014? | Fossils, extinctions, big bangs |
 
-Some findings from real projects:
+Some findings from real projects. Each name links to the full report, so you can check the finding yourself:
 
-- **express.** The *layers by author* view shows the project changing hands: code by TJ Holowaychuk (2009–2014) is gradually replaced by code by Douglas Wilson. Today 94% of the code was written by people who have been inactive for more than a year, and the bus factor is 1.
-- **git.** 21 years of history. The oldest fossil is a line Linus Torvalds wrote in the README on 7 April 2005, explaining the name: *"random three-letter combination that is pronounceable…"*. Half-life is 17 years; this is measured at the integration level, and code inside topic branches lives much shorter. The bus factor is 14.
-- **vite.** Half of the code was written in 2024 or later. Tests outlive source code: 3.5 years against 1.4 years.
+- **[express](https://mxmvshnvsk.github.io/strata-survey/examples/express.html).** The *layers by author* view shows the project changing hands: code by TJ Holowaychuk (2009–2014) is gradually replaced by code by Douglas Wilson. Today 94% of the code was written by people who have been inactive for more than a year, and the bus factor is 1.
+- **[git](https://mxmvshnvsk.github.io/strata-survey/examples/git.html).** 21 years of history. The oldest fossil is a line Linus Torvalds wrote in the README on 7 April 2005, explaining the name: *"random three-letter combination that is pronounceable…"*. Half-life is 17 years; this is measured at the integration level, and code inside topic branches lives much shorter. The bus factor is 14.
+- **[vite](https://mxmvshnvsk.github.io/strata-survey/examples/vite.html).** Half of the code was written in 2024 or later. Tests outlive source code: 3.5 years against 1.4 years.
 
 ## Reading the report
 
-The report is laid out like a geological survey sheet: a title cartouche with metadata, then the column and field notes, then nine plates.
+Open a [sample report](https://mxmvshnvsk.github.io/strata-survey/examples/express.html) next to this section to follow along. The report is laid out like a geological survey sheet: a title cartouche with metadata, then the column and field notes, then nine plates.
 
 1. **Stratigraphic column.**
    - Shows the code alive today, sorted by the year it was written: oldest at the bottom, newest on top.
@@ -146,13 +146,13 @@ Edge cases found during two independent reviews are pinned down by regression te
 
 | Repository | Commits | Files with wrong length | Commit per line vs `blame --first-parent` | Author per line vs `blame` | …if merges were credited to the merger |
 |---|---:|---:|---:|---:|---:|
-| expressjs/express | 6.2k | 0 / 214 | 100.000% | 98.5% | 81.4% |
+| [expressjs/express](https://mxmvshnvsk.github.io/strata-survey/examples/express.html) | 6.2k | 0 / 214 | 100.000% | 98.5% | 81.4% |
 | psf/requests | 6.5k | 0 / 122 | 100.000% | 98.4% | 62.0% |
 | jqlang/jq | 2.0k | 0 / 396 | 100.000% | 99.8% | 98.7% |
 | tj/commander.js | 1.5k | 0 / 215 | 99.982% ¹ | 99.6% | 95.1% |
-| vitejs/vite | 9.7k | 0 / 2721 | 100.000% | 99.0% | 97.5% |
-| pallets/flask | 5.6k | 0 / 230 | 100.000% | 85.0% | 70.6% |
-| git/git | 75k | 0 / 4782 | 100.000% | 95.5% | 10.1% |
+| [vitejs/vite](https://mxmvshnvsk.github.io/strata-survey/examples/vite.html) | 9.7k | 0 / 2721 | 100.000% | 99.0% | 97.5% |
+| [pallets/flask](https://mxmvshnvsk.github.io/strata-survey/examples/flask.html) | 5.6k | 0 / 230 | 100.000% | 85.0% | 70.6% |
+| [git/git](https://mxmvshnvsk.github.io/strata-survey/examples/git.html) | 75k | 0 / 4782 | 100.000% | 95.5% | 10.1% |
 
 ¹ Two lines in byte-identical fixture files where blame picks a different copy of the same content.
 
