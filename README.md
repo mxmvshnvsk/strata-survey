@@ -12,6 +12,8 @@
 - which files are secretly coupled;
 - who holds the knowledge.
 
+**[Open a live sample report →](https://mxmvshnvsk.github.io/strata-survey/examples/express.html)** (express, 17 years of history)
+
 ```
 $ npx strata-survey ~/code/express --open
 
@@ -140,12 +142,16 @@ To get a global `strata` command from your checkout, run `npm install && npm lin
 
 ## Examples
 
-Sample reports are in [`examples/`](examples). Download one and open it in a browser:
+Open a live sample report in your browser:
 
-- [express](examples/express.html)
-- [flask](examples/flask.html)
-- [vite](examples/vite.html)
-- [git](examples/git.html)
+| Report | What to look at |
+|---|---|
+| [**express**](https://mxmvshnvsk.github.io/strata-survey/examples/express.html) | *Layers by author*: the project changing hands from TJ Holowaychuk to Douglas Wilson |
+| [**flask**](https://mxmvshnvsk.github.io/strata-survey/examples/flask.html) | Long-lived maintenance branches and a mass reformatting |
+| [**vite**](https://mxmvshnvsk.github.io/strata-survey/examples/vite.html) | A young monorepo: half of the code was written in 2024 or later |
+| [**git**](https://mxmvshnvsk.github.io/strata-survey/examples/git.html) | 21 years, 75k commits; the oldest fossil is a 2005 line by Linus Torvalds |
+
+The files themselves are in [`examples/`](examples).
 
 ## What the report shows
 
